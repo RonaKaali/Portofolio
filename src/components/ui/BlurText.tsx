@@ -1,6 +1,6 @@
 "use client";
 
-import { motion, TargetAndTransition, Transition } from 'framer-motion';
+import { motion, Transition } from 'framer-motion';
 import { useEffect, useRef, useState, useMemo } from 'react';
 
 interface BlurTextProps {
@@ -11,22 +11,12 @@ interface BlurTextProps {
   direction?: 'top' | 'bottom';
   threshold?: number;
   rootMargin?: string;
-  animationFrom?: TargetAndTransition;
-  animationTo?: TargetAndTransition[];
+  animationFrom?: any;
+  animationTo?: any[];
   easing?: (t: number) => number;
   onAnimationComplete?: () => void;
   stepDuration?: number;
 }
-
-const buildKeyframes = (fromSnapshot: any, toSnapshots: any[]) => {
-  const keys = new Set([...Object.keys(fromSnapshot), ...toSnapshots.flatMap(s => Object.keys(s))]);
-
-  const keyframes: Record<string, any[]> = {};
-  keys.forEach(k => {
-    keyframes[k] = [fromSnapshot[k], ...toSnapshots.map(s => s[k])];
-  });
-  return keyframes;
-};
 
 const BlurText = ({
   text = '',
@@ -89,21 +79,26 @@ const BlurText = ({
   return (
     <p ref={ref} className={`${className} flex flex-wrap`}>
       {elements.map((segment, index) => {
-        const animateKeyframes = buildKeyframes(fromSnapshot as any, toSnapshots as any);
+        // Build keyframes inline to avoid helper function type issues
+        const keys = new Set([...Object.keys(fromSnapshot), ...toSnapshots.flatMap(s => Object.keys(s))]);
+        const animateKeyframes: any = {};
+        keys.forEach(k => {
+          animateKeyframes[k] = [(fromSnapshot as any)[k], ...toSnapshots.map(s => (s as any)[k])];
+        });
 
         const spanTransition: Transition = {
           duration: totalDuration,
           times,
           delay: (index * delay) / 1000,
-          ease: easing
+          ease: easing as any
         };
 
         return (
           <motion.span
             className="inline-block will-change-[transform,filter,opacity]"
             key={index}
-            initial={fromSnapshot}
-            animate={inView ? animateKeyframes : fromSnapshot}
+            initial={fromSnapshot as any}
+            animate={inView ? animateKeyframes : fromSnapshot as any}
             transition={spanTransition}
             onAnimationComplete={index === elements.length - 1 ? onAnimationComplete : undefined}
           >
