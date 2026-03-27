@@ -18,12 +18,12 @@ interface BlurTextProps {
   stepDuration?: number;
 }
 
-const buildKeyframes = (from: Record<string, unknown>, steps: Record<string, unknown>[]) => {
-  const keys = new Set([...Object.keys(from), ...steps.flatMap(s => Object.keys(s))]);
+const buildKeyframes = (fromSnapshot: any, toSnapshots: any[]) => {
+  const keys = new Set([...Object.keys(fromSnapshot), ...toSnapshots.flatMap(s => Object.keys(s))]);
 
-  const keyframes: Record<string, (string | number | unknown)[]> = {};
+  const keyframes: Record<string, any[]> = {};
   keys.forEach(k => {
-    keyframes[k] = [from[k], ...steps.map(s => s[k])];
+    keyframes[k] = [fromSnapshot[k], ...toSnapshots.map(s => s[k])];
   });
   return keyframes;
 };
