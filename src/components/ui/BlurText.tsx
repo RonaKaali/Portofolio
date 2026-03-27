@@ -89,7 +89,7 @@ const BlurText = ({
   return (
     <p ref={ref} className={`${className} flex flex-wrap`}>
       {elements.map((segment, index) => {
-        const animateKeyframes = buildKeyframes(fromSnapshot, toSnapshots);
+        const animateKeyframes = buildKeyframes(fromSnapshot as any, toSnapshots as any);
 
         const spanTransition: Transition = {
           duration: totalDuration,
